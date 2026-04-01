@@ -84,7 +84,7 @@
     letter-spacing: 0.08em; text-transform: uppercase;
     align-self: flex-start; margin-bottom: 12px; width: 100%; max-width: 360px;
   }
-  .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; margin-bottom: 32px; }
+  .team-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; margin-bottom: 32px; }
   .team-btn {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius-sm); padding: 18px 12px; cursor: pointer;
@@ -316,24 +316,34 @@
       <span class="team-name">영업2팀</span>
       <span class="team-region">광양·여수·순천·고흥</span>
     </button>
-    <button class="team-btn" onclick="selectTeam(this,'목포장흥무한해남완도','영업3팀')">
+    <button class="team-btn" onclick="selectTeam(this,'목포무안해남함평','영업3팀')">
       <span class="team-num">3팀</span>
       <span class="team-name">영업3팀</span>
-      <span class="team-region">목포·장흥·무안·해남·완도</span>
+      <span class="team-region">목포·무안·해남·함평</span>
     </button>
     <button class="team-btn" onclick="selectTeam(this,'강진남원순창보성','영업4팀')">
       <span class="team-num">4팀</span>
       <span class="team-name">영업4팀</span>
       <span class="team-region">강진·남원·순창·보성</span>
     </button>
-    <button class="team-btn" onclick="selectTeam(this,'정읍고창함평영광함양해남화순구례와도','영업5팀')">
+    <button class="team-btn" onclick="selectTeam(this,'순창남원구례함양','영업5팀')">
       <span class="team-num">5팀</span>
       <span class="team-name">영업5팀</span>
-      <span class="team-region">정읍·고창·함평·영광 외</span>
+      <span class="team-region">순창·남원·구례·함양</span>
     </button>
-    <button class="team-btn" onclick="selectTeam(this,'화물택배','영업6팀')">
+    <button class="team-btn" onclick="selectTeam(this,'화순나주담양장성','영업6팀')">
       <span class="team-num">6팀</span>
       <span class="team-name">영업6팀</span>
+      <span class="team-region">화순·나주·담양·장성</span>
+    </button>
+    <button class="team-btn" onclick="selectTeam(this,'정읍영광고창전주','영업7팀')">
+      <span class="team-num">7팀</span>
+      <span class="team-name">영업7팀</span>
+      <span class="team-region">정읍·영광·고창·전주</span>
+    </button>
+    <button class="team-btn" onclick="selectTeam(this,'화물택배','영업8팀')">
+      <span class="team-num">8팀</span>
+      <span class="team-name">영업8팀</span>
       <span class="team-region">화물택배</span>
     </button>
   </div>
@@ -448,9 +458,11 @@ function getRegionLabel(sheet) {
   const map = {
     '광주': '광주',
     '광양여수순천고흥': '광양·여수·순천·고흥',
-    '목포장흥무한해남완도': '목포·장흥·무안·해남·완도',
+    '목포무안해남함평': '목포·무안·해남·함평',
     '강진남원순창보성': '강진·남원·순창·보성',
-    '정읍고창함평영광함양해남화순구례와도': '정읍·고창·함평·영광 외',
+    '순창남원구례함양': '순창·남원·구례·함양',
+    '화순나주담양장성': '화순·나주·담양·장성',
+    '정읍영광고창전주': '정읍·영광·고창·전주',
     '화물택배': '화물택배',
   };
   return map[sheet] || sheet;
