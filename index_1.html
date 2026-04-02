@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>출고 배송 앱</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #22222e;
+    --border: #2e2e3e;
+    --text: #f0f0f5;
+    --text2: #9090a8;
+    --text3: #5a5a72;
+    --accent: #4f8fff;
+    --accent2: #6b5fff;
+    --green: #22c55e;
+    --green-dim: #166534;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+  /* ── 설정 배너 (API URL 미설정 시) ── */
+  #setup-banner {
+    background: rgba(245,158,11,0.12);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin: 16px 20px 0;
+    display: none;
+  }
+  #setup-banner h4 { font-size: 13px; font-weight: 700; color: var(--amber); margin-bottom: 6px; }
+  #setup-banner p { font-size: 12px; color: #fbbf24; line-height: 1.6; }
+  #setup-banner input {
+    width: 100%; margin-top: 10px; padding: 10px 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #setup-banner button {
+    margin-top: 8px; width: 100%; padding: 10px;
+    background: var(--amber); border: none; border-radius: 8px;
+    color: #1a1000; font-weight: 700; font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+  }
+
+  /* ── 로그인 화면 ── */
+  #login-screen {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 100vh;
+    padding: 32px 24px; background: var(--bg);
+    position: relative; overflow: hidden;
+  }
+  #login-screen::before {
+    content: ''; position: absolute; width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(79,143,255,0.12) 0%, transparent 70%);
+    top: -100px; left: -100px; pointer-events: none;
+  }
+  #login-screen::after {
+    content: ''; position: absolute; width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(107,95,255,0.10) 0%, transparent 70%);
+    bottom: 0; right: -50px; pointer-events: none;
+  }
+  .login-logo {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600;
+    color: var(--accent); letter-spacing: 0.15em; margin-bottom: 40px;
+    padding: 6px 14px; border: 1px solid rgba(79,143,255,0.3); border-radius: 20px;
+  }
+  .login-title { font-size: 28px; font-weight: 900; color: var(--text); text-align: center; line-height: 1.2; margin-bottom: 8px; }
+  .login-subtitle { font-size: 14px; color: var(--text2); text-align: center; margin-bottom: 48px; }
+  .login-label {
+    font-size: 12px; font-weight: 500; color: var(--text3);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    align-self: flex-start; margin-bottom: 12px; width: 100%; max-width: 360px;
+  }
+  .team-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; margin-bottom: 32px; }
+  .team-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 18px 12px; cursor: pointer;
+    transition: all 0.2s; display: flex; flex-direction: column;
+    align-items: center; gap: 6px; position: relative; overflow: hidden;
+  }
+  .team-btn:active { transform: scale(0.97); }
+  .team-btn.selected { border-color: var(--accent); background: rgba(79,143,255,0.1); }
+  .team-num { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 600; color: var(--accent); }
+  .team-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  .team-region { font-size: 10px; color: var(--text2); text-align: center; line-height: 1.4; }
+  .login-btn {
+    width: 100%; max-width: 360px; padding: 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: var(--radius); color: white;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; opacity: 0.4; pointer-events: none;
+  }
+  .login-btn.active { opacity: 1; pointer-events: all; }
+  .login-btn:active { transform: scale(0.98); }
+
+  /* ── 앱 메인 ── */
+  #app-screen { display: none; min-height: 100vh; }
+
+  .app-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(15,15,19,0.92);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border); padding: 16px 20px;
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .header-team { display: flex; align-items: center; gap: 10px; }
+  .team-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white; font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .header-team-name { font-size: 18px; font-weight: 700; color: var(--text); }
+
+  /* 동기화 상태 표시 */
+  .sync-indicator {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text3);
+  }
+  .sync-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text3); transition: background 0.3s;
+  }
+  .sync-dot.syncing { background: var(--amber); animation: pulse 1s infinite; }
+  .sync-dot.online { background: var(--green); }
+  .sync-dot.offline { background: var(--red); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .logout-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text2); font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px; padding: 6px 12px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .logout-btn:active { opacity: 0.7; }
+
+  .date-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .date-tabs::-webkit-scrollbar { display: none; }
+  .date-tab {
+    flex-shrink: 0; padding: 7px 16px; border-radius: 20px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: all 0.2s; background: var(--surface);
+    border: 1px solid var(--border); color: var(--text2); white-space: nowrap;
+  }
+  .date-tab.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 700; }
+
+  .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 16px 20px 0; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+  .stat-num { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 600; color: var(--text); }
+  .stat-num.green { color: var(--green); }
+  .stat-num.amber { color: var(--amber); }
+  .stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .progress-wrap { padding: 12px 20px; }
+  .progress-bar-bg { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); border-radius: 2px; transition: width 0.5s ease; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+  .filter-bar { display: flex; gap: 8px; padding: 0 20px 12px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    flex-shrink: 0; padding: 5px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    transition: all 0.2s; background: var(--surface);
+    border: 1px solid var(--border); color: var(--text2);
+  }
+  .filter-chip.active { background: var(--surface2); border-color: var(--text2); color: var(--text); }
+
+  /* ── 배송 카드 ── */
+  .delivery-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 100px; }
+
+  .delivery-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; transition: all 0.3s;
+    position: relative;
+  }
+  .delivery-card.completed { opacity: 0.5; border-color: rgba(34,197,94,0.25); }
+  .delivery-card.syncing-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    animation: shimmer 1.2s infinite;
+  }
+  @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+  .card-top { padding: 16px 16px 12px; display: flex; align-items: flex-start; gap: 12px; }
+  .method-badge {
+    flex-shrink: 0; padding: 4px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.03em; margin-top: 2px;
+  }
+  .method-badge.direct { background: rgba(79,143,255,0.15); color: #7ab4ff; border: 1px solid rgba(79,143,255,0.3); }
+  .method-badge.bus { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+  .method-badge.cargo { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
+
+  .card-main { flex: 1; min-width: 0; }
+  .card-company { font-size: 17px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-region { font-size: 12px; color: var(--text3); margin-top: 2px; display: flex; align-items: center; gap: 6px; }
+  .region-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+  .card-items { padding: 0 16px 12px; border-top: 1px solid var(--border); }
+  .item-row { display: flex; align-items: flex-start; gap: 8px; padding: 10px 0; border-bottom: 1px solid rgba(46,46,62,0.5); }
+  .item-row:last-child { border-bottom: none; }
+  .item-icon { width: 28px; height: 28px; background: var(--surface2); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+  .item-info { flex: 1; min-width: 0; }
+  .item-name { font-size: 13px; color: var(--text); line-height: 1.4; word-break: break-all; }
+  .item-qty { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); font-weight: 600; margin-top: 2px; }
+  .date-badge { font-size: 11px; color: var(--text3); background: var(--surface2); padding: 2px 7px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
+
+  .card-footer { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .delivery-day-info { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 6px; }
+
+  .day-chip { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .day-chip.mon { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .day-chip.tue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .day-chip.wed { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .day-chip.thu { background: rgba(239,68,68,0.15); color: #f87171; }
+  .day-chip.fri { background: rgba(168,85,247,0.15); color: #c084fc; }
+  .day-chip.sat { background: rgba(244,114,182,0.15); color: #f472b6; }
+
+  .complete-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 8px;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; border: none;
+  }
+  .complete-btn.pending { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .complete-btn.done { background: rgba(34,197,94,0.08); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+  .complete-btn:active { transform: scale(0.96); }
+  .complete-btn:disabled { opacity: 0.5; pointer-events: none; }
+  .check-icon { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 9px; }
+
+  /* 완료 시간 표시 */
+  .complete-time { font-size: 10px; color: var(--text3); margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+
+  /* 빈 상태 */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+  .empty-title { font-size: 16px; font-weight: 700; color: var(--text2); margin-bottom: 8px; }
+  .empty-desc { font-size: 13px; }
+
+  /* 로딩 */
+  .loading-overlay {
+    position: fixed; inset: 0; background: rgba(15,15,19,0.9);
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; z-index: 1000;
+  }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 13px; color: var(--text2); }
+
+  /* 토스트 */
+  .toast {
+    position: fixed; bottom: 100px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); font-size: 13px; font-weight: 500;
+    padding: 12px 20px; border-radius: 30px;
+    opacity: 0; transition: all 0.3s; pointer-events: none;
+    white-space: nowrap; z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* FAB */
+  .refresh-fab {
+    position: fixed; bottom: 28px; right: 20px;
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center;
+    cursor: pointer; font-size: 20px; transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(79,143,255,0.35); z-index: 50;
+    color: white;
+  }
+  .refresh-fab:active { transform: scale(0.9); }
+  .refresh-fab.spinning { animation: spin 1s linear infinite; }
+
+  .section-divider { display: flex; align-items: center; gap: 10px; padding: 4px 0 8px; }
+  .section-divider-line { flex: 1; height: 1px; background: var(--border); }
+  .section-divider-label { font-size: 11px; color: var(--text3); font-weight: 500; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">데이터 불러오는 중...</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ── 로그인 화면 ── -->
+<div id="login-screen">
+  <div class="login-logo">DELIVERY · SYSTEM</div>
+  <h1 class="login-title">출고 배송<br>관리 시스템</h1>
+  <p class="login-subtitle">담당 영업팀을 선택하세요</p>
+  <div class="login-label">영업팀 선택</div>
+  <div class="team-grid">
+    <button class="team-btn" onclick="selectTeam(this,'광주','영업1팀')">
+      <span class="team-num">1팀</span>
+      <span class="team-name">영업1팀</span>
+      <span class="team-region">광주</span>
+    </button>
+    <button class="team-btn" onclick="selectTeam(this,'광양여수순천고흥','영업2팀')">
+      <span class="team-num">2팀</span>
+      <span class="team-name">영업2팀</span>
+      <span class="team-region">광양·여수·순천·고흥</span>
+    </button>
+    <button class="team-btn" onclick="selectTeam(this,'목포무안해남함평','영업3팀')">
+      <span class="team-num">3팀</span>
+      <span class="team-name">영업3팀</span>
+      <span class="team-region">목포·무안·해남·함평</span>
+    </button>
+    <button class="team-btn" onclick="selectTeam(this,'강진장흥순창보성','영업4팀')">
+      <span class="team-num">4팀</span>
+      <span class="team-name">영업4팀</span>
+      <span class="team-region">강진·장흥·순창·보성</span>
+    </button>
+    <button class="team-btn" onclick="selectTeam(this,'순창남원구례함양','영업5팀')">
+      <span class="team-num">5팀</span>
+      <span class="team-name">영업5팀</span>
+      <span class="team-region">순창·남원·구례·함양</span>
+    </button>
+    <button class="team-btn" onclick="selectTeam(this,'화순나주담양장성','영업6팀')">
+      <span class="team-num">6팀</span>
+      <span class="team-name">영업6팀</span>
+      <span class="team-region">화순·나주·담양·장성</span>
+    </button>
+    <button class="team-btn" onclick="selectTeam(this,'정읍영광고창전주','영업7팀')">
+      <span class="team-num">7팀</span>
+      <span class="team-name">영업7팀</span>
+      <span class="team-region">정읍·영광·고창·전주</span>
+    </button>
+    <button class="team-btn" onclick="selectTeam(this,'화물택배','영업8팀')">
+      <span class="team-num">8팀</span>
+      <span class="team-name">영업8팀</span>
+      <span class="team-region">화물택배</span>
+    </button>
+  </div>
+  <button class="login-btn" id="login-btn" onclick="enterApp()">시작하기 →</button>
+</div>
+
+<!-- ── 앱 메인 화면 ── -->
+<div id="app-screen">
+  <div class="app-header">
+    <div class="header-top">
+      <div class="header-team">
+        <span class="team-badge" id="hdr-badge">영업1팀</span>
+        <span class="header-team-name" id="hdr-name">광주</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="sync-indicator">
+          <div class="sync-dot" id="sync-dot"></div>
+          <span id="sync-label">대기</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">팀 변경</button>
+      </div>
+    </div>
+    <div class="date-tabs" id="date-tabs"></div>
+  </div>
+
+
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-total">0</div>
+      <div class="stat-label">전체</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num amber" id="stat-pending">0</div>
+      <div class="stat-label">미완료</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num green" id="stat-done">0</div>
+      <div class="stat-label">완료</div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-label">
+      <span>오늘 진행률</span>
+      <span id="progress-pct">0%</span>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-chip active" onclick="setFilter(this,'all')">전체</div>
+    <div class="filter-chip" onclick="setFilter(this,'pending')">미완료만</div>
+    <div class="filter-chip" onclick="setFilter(this,'done')">완료만</div>
+    <div class="filter-chip" onclick="setFilter(this,'direct')">직배</div>
+    <div class="filter-chip" onclick="setFilter(this,'bus')">버스</div>
+    <div class="filter-chip" onclick="setFilter(this,'cargo')">화물</div>
+  </div>
+
+  <div class="delivery-list" id="delivery-list"></div>
+
+  <button class="refresh-fab" id="refresh-fab" onclick="loadData(true)" title="새로고침">↻</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  설정
+// ══════════════════════════════════════════
+// ★ Apps Script 배포 후 여기에 URL을 입력하거나,
+//   앱 배너에서 입력해도 됩니다.
+let API_URL = localStorage.getItem('gas_api_url') || 'https://script.google.com/macros/s/AKfycbwnfV-8iAjtx_jDY5GZAhhivpS6VRqMLSjAbKKGukl1z0h6sWa2m0wLIgEqiWZaGzv6vg/exec';
+
+const DAY_KO = ['일','월','화','수','목','금','토'];
+const DAY_CLASS = ['','mon','tue','wed','thu','fri','sat'];
+
+// ── 상태 ──
+let currentTeam = null;
+let allData = [];
+let completedMap = {}; // id → {time}
+let currentDay = null;
+let currentFilter = 'all';
+
+
+
+// ══════════════════════════════════════════
+//  로그인
+// ══════════════════════════════════════════
+function selectTeam(btn, sheetName, teamName) {
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  currentTeam = { sheetName, teamName };
+  document.getElementById('login-btn').classList.add('active');
+}
+
+function enterApp() {
+  if (!currentTeam) return;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('hdr-badge').textContent = currentTeam.teamName;
+  document.getElementById('hdr-name').textContent = getRegionLabel(currentTeam.sheetName);
+
+  // 저장된 완료 데이터 로드
+  const saved = localStorage.getItem('completed_v2_' + currentTeam.sheetName);
+  completedMap = saved ? JSON.parse(saved) : {};
+
+  loadData(true);
+}
+
+function getRegionLabel(sheet) {
+  const map = {
+    '광주': '광주',
+    '광양여수순천고흥': '광양·여수·순천·고흥',
+    '목포무안해남함평': '목포·무안·해남·함평',
+    '강진장흥순창보성': '강진·장흥·순창·보성',
+    '순창남원구례함양': '순창·남원·구례·함양',
+    '화순나주담양장성': '화순·나주·담양·장성',
+    '정읍영광고창전주': '정읍·영광·고창·전주',
+    '화물택배': '화물택배',
+  };
+  return map[sheet] || sheet;
+}
+
+function logout() {
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  currentTeam = null; allData = []; currentDay = null; currentFilter = 'all';
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('login-btn').classList.remove('active');
+}
+
+// ══════════════════════════════════════════
+//  데이터 로드 (Apps Script API → 폴백: 샘플)
+// ══════════════════════════════════════════
+async function loadData(showSpinner = false) {
+  if (showSpinner) showLoading(true);
+  setSyncStatus('syncing');
+  const fab = document.getElementById('refresh-fab');
+  fab.classList.add('spinning');
+
+  try {
+    if (!API_URL) throw new Error('NO_URL');
+
+    const url = `${API_URL}?action=getData&sheet=${encodeURIComponent(currentTeam.sheetName)}`;
+    const res = await fetch(url, { method: 'GET', mode: 'cors' });
+    const json = await res.json();
+
+    if (!json.ok) throw new Error(json.error || 'API 오류');
+
+    allData = json.data;
+    setSyncStatus('online');
+    showToast('✓ 실시간 데이터 동기화 완료');
+
+  } catch (err) {
+    if (err.message !== 'NO_URL') {
+      setSyncStatus('offline');
+      showToast('⚠ 연결 실패 — 마지막 데이터 표시');
+    }
+    // 캐시된 데이터가 없으면 샘플 사용
+    if (allData.length === 0) {
+      allData = getSampleData(currentTeam.sheetName);
+      if (err.message === 'NO_URL') setSyncStatus('offline');
+    }
+  } finally {
+    showLoading(false);
+    fab.classList.remove('spinning');
+    buildDateTabs();
+    renderList();
+  }
+}
+
+// 30초마다 자동 새로고침
+setInterval(() => { if (currentTeam && API_URL) loadData(false); }, 30000);
+
+// ══════════════════════════════════════════
+//  완료 처리 → Apps Script POST
+// ══════════════════════════════════════════
+async function toggleComplete(id, rowNum, btn) {
+  const card = document.getElementById('card_' + id);
+  const wasCompleted = !!completedMap[id];
+  const now = new Date();
+  const timeStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  // UI 즉시 업데이트 (낙관적 업데이트)
+  if (wasCompleted) {
+    delete completedMap[id];
+  } else {
+    completedMap[id] = { time: timeStr };
+  }
+  saveCompleted();
+  renderList(); // 즉시 반영
+
+  // 서버 동기화 (백그라운드)
+  if (API_URL) {
+    try {
+      card && card.classList.add('syncing-card');
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sheet: currentTeam.sheetName,
+          row: rowNum,
+          completed: !wasCompleted,
+          completedTime: !wasCompleted ? timeStr : '',
+        }),
+      });
+      const json = await res.json();
+      if (json.ok) {
+        showToast(!wasCompleted ? '✓ 완료 처리 — 시트에 반영됨' : '↩ 완료 취소 — 시트에 반영됨');
+      } else {
+        throw new Error(json.error);
+      }
+    } catch (err) {
+      showToast('⚠ 시트 반영 실패 (로컬 저장됨)');
+    } finally {
+      const c2 = document.getElementById('card_' + id);
+      c2 && c2.classList.remove('syncing-card');
+    }
+  } else {
+    showToast(!wasCompleted ? '✓ 완료 처리 (로컬 저장)' : '↩ 완료 취소');
+  }
+}
+
+function saveCompleted() {
+  if (!currentTeam) return;
+  localStorage.setItem('completed_v2_' + currentTeam.sheetName, JSON.stringify(completedMap));
+}
+
+// ══════════════════════════════════════════
+//  날짜 탭
+// ══════════════════════════════════════════
+function buildDateTabs() {
+  const today = new Date();
+  const todayKo = DAY_KO[today.getDay()];
+  const container = document.getElementById('date-tabs');
+  container.innerHTML = '';
+
+  const dayOrder = ['월','화','수','목','금','토','일'];
+  const daySet = new Set();
+  allData.forEach(r => {
+    const d = (r['배송(요일)'] || r['자동요일'] || '').trim();
+    if (d) daySet.add(d);
+  });
+
+  // 전체 탭
+  const allTab = document.createElement('div');
+  allTab.className = 'date-tab' + (!currentDay ? ' active' : '');
+  allTab.textContent = '전체';
+  allTab.onclick = () => { currentDay = null; setActiveTab(allTab); renderList(); };
+  container.appendChild(allTab);
+
+  // 요일 탭 (순서대로)
+  dayOrder.filter(d => daySet.has(d)).forEach(d => {
+    const tab = document.createElement('div');
+    const isToday = d === todayKo;
+    tab.className = 'date-tab' + (currentDay === d ? ' active' : '');
+    tab.innerHTML = isToday ? `오늘(${d})` : `${d}요일`;
+    tab.onclick = () => { currentDay = d; setActiveTab(tab); renderList(); };
+    container.appendChild(tab);
+  });
+
+  // 기본: 오늘 요일 (있으면)
+  if (currentDay === null && daySet.has(todayKo)) {
+    currentDay = todayKo;
+    container.querySelectorAll('.date-tab').forEach(t => {
+      t.classList.toggle('active', t.textContent.includes(todayKo));
+    });
+  }
+}
+
+function setActiveTab(tab) {
+  document.querySelectorAll('.date-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+}
+
+// ══════════════════════════════════════════
+//  필터 & 렌더
+// ══════════════════════════════════════════
+function setFilter(chip, filter) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  currentFilter = filter;
+  renderList();
+}
+
+function renderList() {
+  let data = [...allData];
+
+  if (currentDay) {
+    data = data.filter(r => (r['배송(요일)'] || r['자동요일'] || '').trim() === currentDay);
+  }
+
+  if (currentFilter === 'pending') data = data.filter(r => !completedMap[r._id]);
+  if (currentFilter === 'done')    data = data.filter(r =>  completedMap[r._id]);
+  if (currentFilter === 'direct')  data = data.filter(r => (r['출고방법']||'').includes('직배'));
+  if (currentFilter === 'bus')     data = data.filter(r => (r['출고방법']||'').includes('버스'));
+  if (currentFilter === 'cargo')   data = data.filter(r => (r['출고방법']||'').includes('화물'));
+
+  // 통계
+  const dayData = allData.filter(r => !currentDay || (r['배송(요일)'] || r['자동요일'] || '').trim() === currentDay);
+  const total = dayData.length;
+  const done = dayData.filter(r => completedMap[r._id]).length;
+  const pending = total - done;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+
+  const container = document.getElementById('delivery-list');
+  container.innerHTML = '';
+
+  if (data.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">배송 건이 없습니다</div><div class="empty-desc">${currentDay ? currentDay + '요일' : '선택한 조건'} 배송이 없어요</div></div>`;
+    return;
+  }
+
+  // 미완료 → 완료 순
+  data.sort((a, b) => (completedMap[a._id] ? 1 : 0) - (completedMap[b._id] ? 1 : 0));
+
+  let shownDivider = false;
+  data.forEach(row => {
+    const isCompleted = !!completedMap[row._id];
+    if (isCompleted && !shownDivider) {
+      shownDivider = true;
+      const div = document.createElement('div');
+      div.className = 'section-divider';
+      div.innerHTML = `<div class="section-divider-line"></div><div class="section-divider-label">완료된 건</div><div class="section-divider-line"></div>`;
+      container.appendChild(div);
+    }
+    container.appendChild(buildCard(row, isCompleted));
+  });
+}
+
+function buildCard(row, isCompleted) {
+  const method = row['출고방법'] || '';
+  const company = row['업체명'] || '—';
+  const region = row['지역'] || '';
+  const item = row['품목'] || '';
+  const qty = row['수량'] || '';
+  const date = row['날짜'] || '';
+  const day = (row['배송(요일)'] || row['자동요일'] || '').trim();
+  const rowNum = row._row;
+
+  const methodClass = method.includes('버스') ? 'bus' : method.includes('화물') ? 'cargo' : 'direct';
+  const dayIdx = DAY_KO.indexOf(day);
+  const dayClass = dayIdx > 0 ? DAY_CLASS[dayIdx] : '';
+
+  const completed = completedMap[row._id];
+  const timeInfo = completed ? `<div class="complete-time">완료: ${completed.time}</div>` : '';
+
+  const card = document.createElement('div');
+  card.className = 'delivery-card' + (isCompleted ? ' completed' : '');
+  card.id = 'card_' + row._id;
+
+  card.innerHTML = `
+    <div class="card-top">
+      <span class="method-badge ${methodClass}">${method || '직배'}</span>
+      <div class="card-main">
+        <div class="card-company">${company}</div>
+        <div class="card-region">
+          <span class="region-dot"></span>${region}
+          ${date ? `<span class="date-badge">${date}</span>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="card-items">
+      <div class="item-row">
+        <div class="item-icon">📋</div>
+        <div class="item-info">
+          <div class="item-name">${item || '품목 정보 없음'}</div>
+          ${qty ? `<div class="item-qty">수량: ${qty}</div>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="delivery-day-info">
+        배송일 ${day ? `<span class="day-chip ${dayClass}">${day}요일</span>` : ''}
+        ${timeInfo}
+      </div>
+      <button class="complete-btn ${isCompleted ? 'done' : 'pending'}"
+        onclick="toggleComplete('${row._id}', ${rowNum}, this)">
+        <div class="check-icon">${isCompleted ? '✓' : ''}</div>
+        ${isCompleted ? '완료됨' : '완료 처리'}
+      </button>
+    </div>
+  `;
+  return card;
+}
+
+// ══════════════════════════════════════════
+//  동기화 상태 표시
+// ══════════════════════════════════════════
+function setSyncStatus(status) {
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-label');
+  dot.className = 'sync-dot ' + status;
+  label.textContent = { syncing: '동기화 중', online: '실시간 연결', offline: '오프라인' }[status] || '';
+}
+
+// ══════════════════════════════════════════
+//  샘플 데이터 (API 연결 전 미리보기용)
+// ══════════════════════════════════════════
+function getSampleData(sheet) {
+  const base = [
+    { 날짜:'04/02', 지역:'광주', 업체명:'두리공사', 품목:'간판 300*80', 수량:'1', 출고방법:'직배', 완료:'', '배송(요일)':'화', 자동요일:'화' },
+    { 날짜:'04/01', 지역:'광주', 업체명:'선진광고', 품목:'후렉스 700*125 채널 명품축산물', 수량:'2', 출고방법:'직배', 완료:'', '배송(요일)':'수', 자동요일:'수' },
+    { 날짜:'03/31', 지역:'광주', 업체명:'유진', 품목:'클리어필름', 수량:'3', 출고방법:'직배', 완료:'', '배송(요일)':'화', 자동요일:'화' },
+    { 날짜:'04/02', 지역:'광양', 업체명:'매화', 품목:'기성태극기 시기', 수량:'5', 출고방법:'직배', 완료:'', '배송(요일)':'목', 자동요일:'목' },
+    { 날짜:'04/01', 지역:'강진', 업체명:'한솔', 품목:'직사각 현판 400*130', 수량:'1', 출고방법:'버스', 완료:'', '배송(요일)':'수', 자동요일:'수' },
+  ];
+  return base.map((d, i) => ({ ...d, _row: i + 2, _id: sheet + '_' + (i + 2) }));
+}
+
+// ── 유틸 ──
+function showLoading(v) { document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+window.addEventListener('load', () => showLoading(false));
+</script>
+</body>
+</html>
