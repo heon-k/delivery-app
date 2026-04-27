@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>출고 배송 앱</title>
+<title>출고 배송 앱 v2</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@600&display=swap');
 
@@ -21,7 +21,6 @@
     --accent: #4f8fff;
     --accent2: #6b5fff;
     --green: #22c55e;
-    --green-dim: #166534;
     --amber: #f59e0b;
     --red: #ef4444;
     --radius: 16px;
@@ -30,30 +29,6 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-
-  /* ── 설정 배너 (API URL 미설정 시) ── */
-  #setup-banner {
-    background: rgba(245,158,11,0.12);
-    border: 1px solid rgba(245,158,11,0.3);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    margin: 16px 20px 0;
-    display: none;
-  }
-  #setup-banner h4 { font-size: 13px; font-weight: 700; color: var(--amber); margin-bottom: 6px; }
-  #setup-banner p { font-size: 12px; color: #fbbf24; line-height: 1.6; }
-  #setup-banner input {
-    width: 100%; margin-top: 10px; padding: 10px 12px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text); font-size: 12px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  #setup-banner button {
-    margin-top: 8px; width: 100%; padding: 10px;
-    background: var(--amber); border: none; border-radius: 8px;
-    color: #1a1000; font-weight: 700; font-size: 13px;
-    font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
-  }
 
   /* ── 로그인 화면 ── */
   #login-screen {
@@ -67,232 +42,283 @@
     background: radial-gradient(circle, rgba(79,143,255,0.12) 0%, transparent 70%);
     top: -100px; left: -100px; pointer-events: none;
   }
-  #login-screen::after {
-    content: ''; position: absolute; width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(107,95,255,0.10) 0%, transparent 70%);
-    bottom: 0; right: -50px; pointer-events: none;
-  }
   .login-logo {
     font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600;
-    color: var(--accent); letter-spacing: 0.15em; margin-bottom: 40px;
+    color: var(--accent); letter-spacing: 0.15em; margin-bottom: 32px;
     padding: 6px 14px; border: 1px solid rgba(79,143,255,0.3); border-radius: 20px;
   }
-  .login-title { font-size: 28px; font-weight: 900; color: var(--text); text-align: center; line-height: 1.2; margin-bottom: 8px; }
-  .login-subtitle { font-size: 14px; color: var(--text2); text-align: center; margin-bottom: 48px; }
-  .login-label {
-    font-size: 12px; font-weight: 500; color: var(--text3);
-    letter-spacing: 0.08em; text-transform: uppercase;
-    align-self: flex-start; margin-bottom: 12px; width: 100%; max-width: 360px;
+  .login-mode-badge {
+    background: rgba(34,197,94,0.12); color: var(--green); font-size: 11px;
+    padding: 4px 10px; border-radius: 12px; margin-bottom: 12px;
+    border: 1px solid rgba(34,197,94,0.3);
   }
-  .team-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; margin-bottom: 32px; }
+  .login-title { font-size: 26px; font-weight: 900; color: var(--text); text-align: center; line-height: 1.2; margin-bottom: 6px; }
+  .login-subtitle { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 36px; }
+  .login-label {
+    font-size: 11px; font-weight: 500; color: var(--text3);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    align-self: flex-start; margin-bottom: 10px; width: 100%; max-width: 360px;
+  }
+  .team-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; margin-bottom: 24px; }
   .team-btn {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 18px 12px; cursor: pointer;
+    border-radius: var(--radius-sm); padding: 16px 10px; cursor: pointer;
     transition: all 0.2s; display: flex; flex-direction: column;
-    align-items: center; gap: 6px; position: relative; overflow: hidden;
+    align-items: center; gap: 4px;
   }
   .team-btn:active { transform: scale(0.97); }
   .team-btn.selected { border-color: var(--accent); background: rgba(79,143,255,0.1); }
-  .team-num { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 600; color: var(--accent); }
-  .team-name { font-size: 13px; font-weight: 700; color: var(--text); }
-  .team-region { font-size: 10px; color: var(--text2); text-align: center; line-height: 1.4; }
+  .team-num { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 600; color: var(--accent); }
+  .team-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .team-region { font-size: 10px; color: var(--text2); text-align: center; line-height: 1.3; }
   .login-btn {
-    width: 100%; max-width: 360px; padding: 18px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border: none; border-radius: var(--radius); color: white;
-    font-family: 'Noto Sans KR', sans-serif; font-size: 16px; font-weight: 700;
-    cursor: pointer; transition: all 0.2s; opacity: 0.4; pointer-events: none;
+    width: 100%; max-width: 360px; padding: 16px;
+    background: var(--accent); border: none; border-radius: var(--radius-sm);
+    color: #fff; font-weight: 700; font-size: 15px; cursor: pointer;
+    opacity: 0.4; pointer-events: none; transition: opacity 0.2s;
+    font-family: 'Noto Sans KR', sans-serif;
   }
-  .login-btn.active { opacity: 1; pointer-events: all; }
-  .login-btn:active { transform: scale(0.98); }
+  .login-btn.active { opacity: 1; pointer-events: auto; }
+  .stats-entry-btn {
+    width: 100%; max-width: 360px; padding: 14px; margin-top: 10px;
+    background: var(--surface); border: 1px solid var(--accent2);
+    color: var(--accent2); font-weight: 700; font-size: 14px;
+    border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
 
   /* ── 앱 메인 ── */
-  #app-screen { display: none; min-height: 100vh; }
-
   .app-header {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(15,15,19,0.92);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border); padding: 16px 20px;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 14px 16px 0; position: sticky; top: 0; z-index: 10;
   }
-  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .header-team { display: flex; align-items: center; gap: 10px; }
   .team-badge {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: white; font-size: 12px; font-weight: 700;
-    padding: 4px 10px; border-radius: 20px;
+    background: var(--accent); color: #fff; font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 12px;
   }
-  .header-team-name { font-size: 18px; font-weight: 700; color: var(--text); }
-
-  /* 동기화 상태 표시 */
-  .sync-indicator {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; color: var(--text3);
-  }
-  .sync-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--text3); transition: background 0.3s;
-  }
-  .sync-dot.syncing { background: var(--amber); animation: pulse 1s infinite; }
-  .sync-dot.online { background: var(--green); }
-  .sync-dot.offline { background: var(--red); }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
+  .header-team-name { font-size: 15px; font-weight: 700; }
   .logout-btn {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text2); font-family: 'Noto Sans KR', sans-serif;
-    font-size: 12px; padding: 6px 12px; border-radius: 8px;
-    cursor: pointer; transition: all 0.2s;
+    background: transparent; border: 1px solid var(--border); color: var(--text2);
+    font-size: 12px; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
   }
-  .logout-btn:active { opacity: 0.7; }
+  .sync-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); }
+  .sync-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .sync-dot.offline { background: var(--red); }
+  .sync-dot.syncing { background: var(--amber); animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100% {opacity:1;} 50%{opacity:0.4;} }
 
-  .date-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .date-tabs { display: flex; gap: 6px; padding-bottom: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .date-tabs::-webkit-scrollbar { display: none; }
   .date-tab {
-    flex-shrink: 0; padding: 7px 16px; border-radius: 20px;
-    font-size: 13px; font-weight: 500; cursor: pointer;
-    transition: all 0.2s; background: var(--surface);
-    border: 1px solid var(--border); color: var(--text2); white-space: nowrap;
+    flex-shrink: 0; padding: 8px 14px; border-radius: 18px;
+    background: var(--surface2); color: var(--text2); font-size: 12px;
+    font-weight: 500; cursor: pointer; white-space: nowrap;
+    border: 1px solid transparent;
   }
-  .date-tab.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 700; }
+  .date-tab.active { background: var(--accent); color: #fff; }
 
-  .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 16px 20px 0; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
-  .stat-num { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 600; color: var(--text); }
-  .stat-num.green { color: var(--green); }
+  .stats-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 16px 16px 0; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px; text-align: center;
+  }
+  .stat-num { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; }
   .stat-num.amber { color: var(--amber); }
-  .stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .stat-num.green { color: var(--green); }
+  .stat-label { font-size: 11px; color: var(--text2); margin-top: 4px; }
 
-  .progress-wrap { padding: 12px 20px; }
-  .progress-bar-bg { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); border-radius: 2px; transition: width 0.5s ease; }
-  .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-top: 6px; }
+  .progress-wrap { padding: 16px; }
+  .progress-bar-bg {
+    width: 100%; height: 8px; background: var(--surface2);
+    border-radius: 4px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--green));
+    border-radius: 4px; transition: width 0.3s;
+  }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-top: 8px; }
 
-  .filter-bar { display: flex; gap: 8px; padding: 0 20px 12px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); }
+  .filter-bar {
+    display: flex; gap: 6px; padding: 0 16px 14px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
   .filter-bar::-webkit-scrollbar { display: none; }
   .filter-chip {
-    flex-shrink: 0; padding: 5px 12px; border-radius: 20px;
-    font-size: 12px; font-weight: 500; cursor: pointer;
-    transition: all 0.2s; background: var(--surface);
-    border: 1px solid var(--border); color: var(--text2);
+    flex-shrink: 0; padding: 6px 14px; border-radius: 18px;
+    background: var(--surface2); color: var(--text2); font-size: 12px;
+    font-weight: 500; cursor: pointer; border: 1px solid transparent; white-space: nowrap;
   }
-  .filter-chip.active { background: var(--surface2); border-color: var(--text2); color: var(--text); }
+  .filter-chip.active { background: var(--accent); color: #fff; }
 
-  /* ── 배송 카드 ── */
-  .delivery-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; padding-bottom: 100px; }
-
+  .delivery-list { padding: 0 16px 80px; display: flex; flex-direction: column; gap: 10px; }
   .delivery-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); overflow: hidden; transition: all 0.3s;
-    position: relative;
+    border-radius: var(--radius); padding: 14px; transition: all 0.2s;
   }
-  .delivery-card.completed { opacity: 0.5; border-color: rgba(34,197,94,0.25); }
-  .delivery-card.syncing-card::after {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--amber), transparent);
-    animation: shimmer 1.2s infinite;
-  }
-  @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
-
-  .card-top { padding: 16px 16px 12px; display: flex; align-items: flex-start; gap: 12px; }
+  .delivery-card.completed { opacity: 0.55; border-color: rgba(34,197,94,0.25); }
+  .delivery-card.syncing-card { border-color: var(--amber); }
+  .card-top { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
   .method-badge {
-    flex-shrink: 0; padding: 4px 10px; border-radius: 6px;
-    font-size: 11px; font-weight: 700; letter-spacing: 0.03em; margin-top: 2px;
+    flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 4px 8px;
+    border-radius: 6px; color: #fff; min-width: 36px; text-align: center;
   }
-  .method-badge.direct { background: rgba(79,143,255,0.15); color: #7ab4ff; border: 1px solid rgba(79,143,255,0.3); }
-  .method-badge.bus { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-  .method-badge.cargo { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
-
+  .method-badge.direct { background: var(--accent); }
+  .method-badge.bus { background: var(--amber); }
+  .method-badge.cargo { background: var(--accent2); }
   .card-main { flex: 1; min-width: 0; }
-  .card-company { font-size: 17px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .card-region { font-size: 12px; color: var(--text3); margin-top: 2px; display: flex; align-items: center; gap: 6px; }
-  .region-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
-
-  .card-items { padding: 0 16px 12px; border-top: 1px solid var(--border); }
-  .item-row { display: flex; align-items: flex-start; gap: 8px; padding: 10px 0; border-bottom: 1px solid rgba(46,46,62,0.5); }
-  .item-row:last-child { border-bottom: none; }
-  .item-icon { width: 28px; height: 28px; background: var(--surface2); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 1px; }
-  .item-info { flex: 1; min-width: 0; }
-  .item-name { font-size: 13px; color: var(--text); line-height: 1.4; word-break: break-all; }
-  .item-qty { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); font-weight: 600; margin-top: 2px; }
-  .date-badge { font-size: 11px; color: var(--text3); background: var(--surface2); padding: 2px 7px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
-
-  .card-footer { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .delivery-day-info { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 6px; }
-
-  .day-chip { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
-  .day-chip.mon { background: rgba(34,197,94,0.15); color: #4ade80; }
-  .day-chip.tue { background: rgba(59,130,246,0.15); color: #60a5fa; }
-  .day-chip.wed { background: rgba(245,158,11,0.15); color: #fbbf24; }
-  .day-chip.thu { background: rgba(239,68,68,0.15); color: #f87171; }
-  .day-chip.fri { background: rgba(168,85,247,0.15); color: #c084fc; }
-  .day-chip.sat { background: rgba(244,114,182,0.15); color: #f472b6; }
-
+  .card-company { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .card-region { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .region-dot { width: 4px; height: 4px; background: var(--text3); border-radius: 50%; }
+  .date-badge { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+  .card-items { background: var(--surface2); border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+  .item-row { display: flex; align-items: flex-start; gap: 10px; }
+  .item-icon { font-size: 14px; }
+  .item-info { flex: 1; }
+  .item-name { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; }
+  .item-qty { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .card-footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .delivery-day-info { font-size: 11px; color: var(--text2); }
+  .day-chip { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-weight: 700; color: var(--text); }
+  .complete-time { font-size: 10px; color: var(--green); margin-top: 2px; }
   .complete-btn {
-    display: flex; align-items: center; gap: 6px;
-    padding: 8px 16px; border-radius: 8px;
-    font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; transition: all 0.2s; border: none;
+    flex-shrink: 0; padding: 8px 14px; border-radius: 8px; border: none;
+    font-weight: 700; font-size: 12px; cursor: pointer; display: flex;
+    align-items: center; gap: 6px; font-family: 'Noto Sans KR', sans-serif;
   }
-  .complete-btn.pending { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
-  .complete-btn.done { background: rgba(34,197,94,0.08); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
-  .complete-btn:active { transform: scale(0.96); }
-  .complete-btn:disabled { opacity: 0.5; pointer-events: none; }
-  .check-icon { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 9px; }
+  .complete-btn.pending { background: var(--accent); color: #fff; }
+  .complete-btn.done { background: var(--surface2); color: var(--green); border: 1px solid var(--green); }
+  .check-icon { font-weight: 900; }
 
-  /* 완료 시간 표시 */
-  .complete-time { font-size: 10px; color: var(--text3); margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+  .section-divider { display: flex; align-items: center; gap: 10px; margin: 12px 0 6px; }
+  .section-divider-line { flex: 1; height: 1px; background: var(--border); }
+  .section-divider-label { font-size: 11px; color: var(--text2); }
 
-  /* 빈 상태 */
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
-  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
-  .empty-title { font-size: 16px; font-weight: 700; color: var(--text2); margin-bottom: 8px; }
-  .empty-desc { font-size: 13px; }
+  .empty-state { text-align: center; padding: 50px 20px; color: var(--text2); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .empty-desc { font-size: 12px; color: var(--text3); }
 
-  /* 로딩 */
-  .loading-overlay {
-    position: fixed; inset: 0; background: rgba(15,15,19,0.9);
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; z-index: 1000;
+  .refresh-fab {
+    position: fixed; bottom: 24px; right: 20px; width: 52px; height: 52px;
+    border-radius: 50%; background: var(--accent); color: #fff; border: none;
+    font-size: 22px; cursor: pointer; box-shadow: 0 4px 16px rgba(79,143,255,0.5);
+    z-index: 5;
   }
-  .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
+  .refresh-fab.spinning { animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-200%);
+    background: var(--surface); color: var(--text); padding: 12px 20px;
+    border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
+    border: 1px solid var(--border); z-index: 100; transition: transform 0.3s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .loading-overlay {
+    position: fixed; inset: 0; background: rgba(15,15,19,0.8);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 200; gap: 16px;
+  }
+  .spinner {
+    width: 36px; height: 36px; border: 3px solid var(--surface2);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
   .loading-text { font-size: 13px; color: var(--text2); }
 
-  /* 토스트 */
-  .toast {
-    position: fixed; bottom: 100px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); font-size: 13px; font-weight: 500;
-    padding: 12px 20px; border-radius: 30px;
-    opacity: 0; transition: all 0.3s; pointer-events: none;
-    white-space: nowrap; z-index: 999;
+  /* ── 통계 화면 ── */
+  .stats-tabs {
+    display: flex; gap: 4px; padding: 0 16px; margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
   }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* FAB */
-  .refresh-fab {
-    position: fixed; bottom: 28px; right: 20px;
-    width: 52px; height: 52px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border: none; border-radius: 50%; display: flex;
-    align-items: center; justify-content: center;
-    cursor: pointer; font-size: 20px; transition: all 0.2s;
-    box-shadow: 0 4px 20px rgba(79,143,255,0.35); z-index: 50;
-    color: white;
+  .stats-tab {
+    padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 600;
+    color: var(--text2); border-bottom: 2px solid transparent; transition: all 0.2s;
   }
-  .refresh-fab:active { transform: scale(0.9); }
-  .refresh-fab.spinning { animation: spin 1s linear infinite; }
+  .stats-tab.active { color: var(--accent); border-color: var(--accent); }
 
-  .section-divider { display: flex; align-items: center; gap: 10px; padding: 4px 0 8px; }
-  .section-divider-line { flex: 1; height: 1px; background: var(--border); }
-  .section-divider-label { font-size: 11px; color: var(--text3); font-weight: 500; white-space: nowrap; }
+  .stats-section { padding: 0 16px 24px; }
+
+  .stats-sum-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px; text-align: center;
+  }
+  .stats-sum-num { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; }
+  .stats-sum-label { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+  .stats-bar-item {
+    display: grid; grid-template-columns: 90px 1fr auto;
+    gap: 8px; align-items: center; font-size: 12px;
+  }
+  .stats-bar-label {
+    font-weight: 600; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; color: var(--text);
+  }
+  .stats-bar-track {
+    flex: 1; background: var(--surface2); border-radius: 4px;
+    height: 22px; overflow: hidden; position: relative;
+  }
+  .stats-bar-fill {
+    height: 100%; border-radius: 4px; display: flex; align-items: center;
+    padding: 0 8px; transition: width 0.4s; min-width: 32px;
+  }
+  .stats-bar-val { font-size: 11px; font-weight: 700; color: #fff; }
+  .stats-bar-region { font-size: 10px; color: var(--text2); text-align: right; min-width: 60px; }
+
+  .low-item {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--surface2); padding: 10px 12px; border-radius: 8px;
+    border-left: 3px solid var(--red);
+  }
+  .low-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .low-info { font-size: 10px; color: var(--text2); margin-top: 2px; }
+  .low-count { font-size: 13px; font-weight: 700; color: var(--red); }
+
+  .region-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px; margin-bottom: 10px;
+  }
+  .region-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .region-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .region-stats { font-size: 11px; color: var(--text2); }
+  .region-stats strong { color: var(--accent); font-weight: 700; }
+  .region-progress {
+    width: 100%; height: 6px; background: var(--surface2);
+    border-radius: 3px; overflow: hidden; margin-bottom: 8px;
+  }
+  .region-progress-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+  .region-companies { font-size: 11px; color: var(--text3); line-height: 1.6; }
+  .region-companies span { background: var(--surface2); padding: 2px 7px; border-radius: 10px; margin-right: 4px; display: inline-block; margin-bottom: 3px; }
+
+  .period-controls { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .period-chip {
+    padding: 6px 12px; border-radius: 14px; background: var(--surface2);
+    color: var(--text2); font-size: 12px; cursor: pointer; border: 1px solid transparent;
+  }
+  .period-chip.active { background: var(--accent); color: #fff; }
+
+  .day-bar { display: grid; grid-template-columns: 60px 1fr auto; gap: 8px; align-items: center; padding: 4px 0; font-size: 12px; }
+  .day-bar-label { color: var(--text2); }
+  .day-bar-track { background: var(--surface2); height: 18px; border-radius: 3px; overflow: hidden; }
+  .day-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+  .day-bar-val { font-weight: 700; color: var(--text); min-width: 32px; text-align: right; }
+
+  .data-source-badge {
+    display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 10px;
+    background: rgba(34,197,94,0.15); color: var(--green); margin-left: 8px;
+    border: 1px solid rgba(34,197,94,0.3);
+  }
 </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loading">
+<div class="loading-overlay" id="loading" style="display:none;">
   <div class="spinner"></div>
   <div class="loading-text" id="loading-text">데이터 불러오는 중...</div>
 </div>
@@ -301,57 +327,124 @@
 
 <!-- ── 로그인 화면 ── -->
 <div id="login-screen">
-  <div class="login-logo">DELIVERY · SYSTEM</div>
+  <div class="login-logo">DELIVERY · v2</div>
+  <div class="login-mode-badge">📥 시트 읽기 전용 · 통계는 앱 자체 저장</div>
   <h1 class="login-title">출고 배송<br>관리 시스템</h1>
   <p class="login-subtitle">담당 영업팀을 선택하세요</p>
   <div class="login-label">영업팀 선택</div>
   <div class="team-grid">
     <button class="team-btn" onclick="selectTeam(this,'광주','영업1팀')">
-      <span class="team-num">1팀</span>
-      <span class="team-name">영업1팀</span>
-      <span class="team-region">광주</span>
+      <span class="team-num">1팀</span><span class="team-name">영업1팀</span><span class="team-region">광주</span>
     </button>
     <button class="team-btn" onclick="selectTeam(this,'광양여수순천고흥','영업2팀')">
-      <span class="team-num">2팀</span>
-      <span class="team-name">영업2팀</span>
-      <span class="team-region">광양·여수·순천·고흥</span>
+      <span class="team-num">2팀</span><span class="team-name">영업2팀</span><span class="team-region">광양·여수·순천·고흥</span>
     </button>
     <button class="team-btn" onclick="selectTeam(this,'목포무안해남함평','영업3팀')">
-      <span class="team-num">3팀</span>
-      <span class="team-name">영업3팀</span>
-      <span class="team-region">목포·무안·해남·함평</span>
+      <span class="team-num">3팀</span><span class="team-name">영업3팀</span><span class="team-region">목포·무안·해남·함평</span>
     </button>
     <button class="team-btn" onclick="selectTeam(this,'강진장흥순창보성','영업4팀')">
-      <span class="team-num">4팀</span>
-      <span class="team-name">영업4팀</span>
-      <span class="team-region">강진·장흥·순창·보성</span>
+      <span class="team-num">4팀</span><span class="team-name">영업4팀</span><span class="team-region">강진·장흥·순창·보성</span>
     </button>
     <button class="team-btn" onclick="selectTeam(this,'순창남원구례함양','영업5팀')">
-      <span class="team-num">5팀</span>
-      <span class="team-name">영업5팀</span>
-      <span class="team-region">순창·남원·구례·함양</span>
+      <span class="team-num">5팀</span><span class="team-name">영업5팀</span><span class="team-region">순창·남원·구례·함양</span>
     </button>
     <button class="team-btn" onclick="selectTeam(this,'화순나주담양장성','영업6팀')">
-      <span class="team-num">6팀</span>
-      <span class="team-name">영업6팀</span>
-      <span class="team-region">화순·나주·담양·장성</span>
+      <span class="team-num">6팀</span><span class="team-name">영업6팀</span><span class="team-region">화순·나주·담양·장성</span>
     </button>
     <button class="team-btn" onclick="selectTeam(this,'정읍영광고창전주','영업7팀')">
-      <span class="team-num">7팀</span>
-      <span class="team-name">영업7팀</span>
-      <span class="team-region">정읍·영광·고창·전주</span>
+      <span class="team-num">7팀</span><span class="team-name">영업7팀</span><span class="team-region">정읍·영광·고창·전주</span>
     </button>
     <button class="team-btn" onclick="selectTeam(this,'화물택배','영업8팀')">
-      <span class="team-num">8팀</span>
-      <span class="team-name">영업8팀</span>
-      <span class="team-region">화물택배</span>
+      <span class="team-num">8팀</span><span class="team-name">영업8팀</span><span class="team-region">화물택배</span>
     </button>
   </div>
   <button class="login-btn" id="login-btn" onclick="enterApp()">시작하기 →</button>
+  <button class="stats-entry-btn" onclick="showStats()">📊 거래량 통계 보기</button>
+</div>
+
+<!-- ── 통계 화면 ── -->
+<div id="stats-screen" style="display:none;">
+  <div class="app-header">
+    <div class="header-top">
+      <div class="header-team">
+        <span class="team-badge" style="background:var(--accent2)">통계</span>
+        <span class="header-team-name">거래량 분석</span>
+        <span class="data-source-badge">앱 자체 저장</span>
+      </div>
+      <button class="logout-btn" onclick="hideStats()">← 돌아가기</button>
+    </div>
+    <div class="stats-tabs">
+      <div class="stats-tab active" onclick="switchStatsTab(this,'company')">업체별</div>
+      <div class="stats-tab" onclick="switchStatsTab(this,'region')">지역별</div>
+      <div class="stats-tab" onclick="switchStatsTab(this,'period')">기간별</div>
+    </div>
+  </div>
+
+  <div style="padding:14px 16px 8px;">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+      <select id="stats-team-select" onchange="renderAllStats()" style="flex:1;min-width:120px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;">
+        <option value="">전체 팀</option>
+        <option value="영업1팀">영업1팀 (광주)</option>
+        <option value="영업2팀">영업2팀 (광양·여수·순천)</option>
+        <option value="영업3팀">영업3팀 (목포·무안·해남)</option>
+        <option value="영업4팀">영업4팀 (강진·장흥·순창)</option>
+        <option value="영업5팀">영업5팀 (순창·남원·구례)</option>
+        <option value="영업6팀">영업6팀 (화순·나주·담양)</option>
+        <option value="영업7팀">영업7팀 (정읍·영광·고창)</option>
+        <option value="영업8팀">영업8팀 (화물택배)</option>
+      </select>
+      <button onclick="resetStats()" style="background:transparent;border:1px solid #ef4444;color:#ef4444;border-radius:var(--radius-sm);padding:8px 10px;font-size:12px;cursor:pointer;">전체 초기화</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;" id="stats-summary"></div>
+  </div>
+
+  <!-- 업체별 -->
+  <div id="stats-tab-company" class="stats-section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text);">업체별 완료 건수</div>
+      <select id="stats-sort" onchange="renderStatsCompany()" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-size:12px;">
+        <option value="desc">많은 순</option>
+        <option value="asc">적은 순</option>
+      </select>
+    </div>
+    <div style="background:var(--surface);border-radius:var(--radius);padding:14px;margin-bottom:14px;">
+      <div id="stats-chart" style="display:flex;flex-direction:column;gap:6px;max-height:420px;overflow-y:auto;"></div>
+    </div>
+    <div style="background:var(--surface);border-radius:var(--radius);padding:14px;">
+      <div style="font-size:13px;font-weight:500;color:#ef4444;margin-bottom:10px;">⚠ 거래 부진 업체 (3건 이하)</div>
+      <div id="stats-low-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+  </div>
+
+  <!-- 지역별 -->
+  <div id="stats-tab-region" class="stats-section" style="display:none;">
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;">시·군별 거래량 분석</div>
+    <div id="region-list"></div>
+  </div>
+
+  <!-- 기간별 -->
+  <div id="stats-tab-period" class="stats-section" style="display:none;">
+    <div class="period-controls">
+      <div class="period-chip active" onclick="setPeriod(this,'all')">전체</div>
+      <div class="period-chip" onclick="setPeriod(this,'thisMonth')">이번 달</div>
+      <div class="period-chip" onclick="setPeriod(this,'lastMonth')">지난 달</div>
+      <div class="period-chip" onclick="setPeriod(this,'last30')">최근 30일</div>
+      <div class="period-chip" onclick="setPeriod(this,'last7')">최근 7일</div>
+    </div>
+    <div style="background:var(--surface);border-radius:var(--radius);padding:14px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;">기간 내 요일별 분포</div>
+      <div id="period-day-chart"></div>
+    </div>
+    <div style="background:var(--surface);border-radius:var(--radius);padding:14px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;">기간 내 거래 내역 (최근 100건)</div>
+      <div id="period-history" style="display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto;"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ── 앱 메인 화면 ── -->
-<div id="app-screen">
+<div id="app-screen" style="display:none;">
   <div class="app-header">
     <div class="header-top">
       <div class="header-team">
@@ -363,33 +456,21 @@
           <div class="sync-dot" id="sync-dot"></div>
           <span id="sync-label">대기</span>
         </div>
+        <button class="logout-btn" onclick="showStats()">📊</button>
         <button class="logout-btn" onclick="logout()">팀 변경</button>
       </div>
     </div>
     <div class="date-tabs" id="date-tabs"></div>
   </div>
 
-
-
   <div class="stats-bar">
-    <div class="stat-card">
-      <div class="stat-num" id="stat-total">0</div>
-      <div class="stat-label">전체</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num amber" id="stat-pending">0</div>
-      <div class="stat-label">미완료</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num green" id="stat-done">0</div>
-      <div class="stat-label">완료</div>
-    </div>
+    <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">전체</div></div>
+    <div class="stat-card"><div class="stat-num amber" id="stat-pending">0</div><div class="stat-label">미완료</div></div>
+    <div class="stat-card"><div class="stat-num green" id="stat-done">0</div><div class="stat-label">완료</div></div>
   </div>
 
   <div class="progress-wrap">
-    <div class="progress-bar-bg">
-      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
-    </div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
     <div class="progress-label">
       <span>오늘 진행률</span>
       <span id="progress-pct">0%</span>
@@ -407,28 +488,46 @@
 
   <div class="delivery-list" id="delivery-list"></div>
 
-  <button class="refresh-fab" id="refresh-fab" onclick="loadData(true)" title="새로고침">↻</button>
+  <button class="refresh-fab" id="refresh-fab" onclick="loadData(true)" title="시트 새로고침">↻</button>
 </div>
 
 <script>
 // ══════════════════════════════════════════
-//  설정
+//  설정 — 시트는 읽기 전용 (GET만 사용)
 // ══════════════════════════════════════════
-// ★ Apps Script 배포 후 여기에 URL을 입력하거나,
-//   앱 배너에서 입력해도 됩니다.
-let API_URL = localStorage.getItem('gas_api_url') || 'https://script.google.com/macros/s/AKfycbwnfV-8iAjtx_jDY5GZAhhivpS6VRqMLSjAbKKGukl1z0h6sWa2m0wLIgEqiWZaGzv6vg/exec';
+const API_URL = localStorage.getItem('gas_api_url') ||
+  'https://script.google.com/macros/s/AKfycbwnfV-8iAjtx_jDY5GZAhhivpS6VRqMLSjAbKKGukl1z0h6sWa2m0wLIgEqiWZaGzv6vg/exec';
 
 const DAY_KO = ['일','월','화','수','목','금','토'];
 const DAY_CLASS = ['','mon','tue','wed','thu','fri','sat'];
 
+const REGION_LABELS = {
+  '광주': '광주',
+  '광양여수순천고흥': '광양·여수·순천·고흥',
+  '목포무안해남함평': '목포·무안·해남·함평',
+  '강진장흥순창보성': '강진·장흥·순창·보성',
+  '순창남원구례함양': '순창·남원·구례·함양',
+  '화순나주담양장성': '화순·나주·담양·장성',
+  '정읍영광고창전주': '정읍·영광·고창·전주',
+  '화물택배': '화물택배',
+};
+
+// LocalStorage Keys
+const LS = {
+  schedule: (sheet) => 'schedule_v2_' + sheet,        // 시트에서 가져온 일정 캐시
+  completed: (sheet) => 'completed_v2_' + sheet,      // 완료 처리 상태
+  stats: 'delivery_stats_v2',                         // 거래량 통계 (집계)
+  history: 'delivery_history_v2',                     // 거래 내역 (시계열)
+};
+
 // ── 상태 ──
 let currentTeam = null;
 let allData = [];
-let completedMap = {}; // id → {time}
+let completedMap = {};
 let currentDay = null;
 let currentFilter = 'all';
-
-
+let currentStatsTab = 'company';
+let currentPeriod = 'all';
 
 // ══════════════════════════════════════════
 //  로그인
@@ -443,29 +542,28 @@ function selectTeam(btn, sheetName, teamName) {
 function enterApp() {
   if (!currentTeam) return;
   document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('stats-screen').style.display = 'none';
   document.getElementById('app-screen').style.display = 'block';
   document.getElementById('hdr-badge').textContent = currentTeam.teamName;
-  document.getElementById('hdr-name').textContent = getRegionLabel(currentTeam.sheetName);
+  document.getElementById('hdr-name').textContent = REGION_LABELS[currentTeam.sheetName] || currentTeam.sheetName;
 
-  // 저장된 완료 데이터 로드
-  const saved = localStorage.getItem('completed_v2_' + currentTeam.sheetName);
-  completedMap = saved ? JSON.parse(saved) : {};
+  // 로컬 캐시 복원
+  const savedComp = localStorage.getItem(LS.completed(currentTeam.sheetName));
+  completedMap = savedComp ? JSON.parse(savedComp) : {};
+
+  const savedSched = localStorage.getItem(LS.schedule(currentTeam.sheetName));
+  if (savedSched) {
+    try {
+      const cached = JSON.parse(savedSched);
+      allData = cached.data || [];
+      buildDateTabs();
+      renderList();
+      setSyncStatus('offline');
+      showToast('💾 캐시된 일정 표시 — 새로고침하면 시트 동기화');
+    } catch(e) {}
+  }
 
   loadData(true);
-}
-
-function getRegionLabel(sheet) {
-  const map = {
-    '광주': '광주',
-    '광양여수순천고흥': '광양·여수·순천·고흥',
-    '목포무안해남함평': '목포·무안·해남·함평',
-    '강진장흥순창보성': '강진·장흥·순창·보성',
-    '순창남원구례함양': '순창·남원·구례·함양',
-    '화순나주담양장성': '화순·나주·담양·장성',
-    '정읍영광고창전주': '정읍·영광·고창·전주',
-    '화물택배': '화물택배',
-  };
-  return map[sheet] || sheet;
 }
 
 function logout() {
@@ -477,36 +575,39 @@ function logout() {
 }
 
 // ══════════════════════════════════════════
-//  데이터 로드 (Apps Script API → 폴백: 샘플)
+//  데이터 로드 — 시트 읽기 → 로컬 저장
 // ══════════════════════════════════════════
 async function loadData(showSpinner = false) {
+  if (!currentTeam) return;
   if (showSpinner) showLoading(true);
   setSyncStatus('syncing');
   const fab = document.getElementById('refresh-fab');
   fab.classList.add('spinning');
 
   try {
-    if (!API_URL) throw new Error('NO_URL');
-
     const url = `${API_URL}?action=getData&sheet=${encodeURIComponent(currentTeam.sheetName)}`;
     const res = await fetch(url, { method: 'GET', mode: 'cors' });
     const json = await res.json();
-
     if (!json.ok) throw new Error(json.error || 'API 오류');
 
-    allData = json.data;
-    setSyncStatus('online');
-    showToast('✓ 실시간 데이터 동기화 완료');
+    allData = json.data || [];
 
+    // 시트 일정을 로컬에 저장 (시트가 안 열려도 다음 접속 시 사용 가능)
+    localStorage.setItem(LS.schedule(currentTeam.sheetName), JSON.stringify({
+      data: allData,
+      savedAt: new Date().toISOString(),
+    }));
+
+    setSyncStatus('online');
+    showToast('✓ 시트에서 일정 ' + allData.length + '건 가져옴');
   } catch (err) {
-    if (err.message !== 'NO_URL') {
-      setSyncStatus('offline');
-      showToast('⚠ 연결 실패 — 마지막 데이터 표시');
-    }
-    // 캐시된 데이터가 없으면 샘플 사용
+    setSyncStatus('offline');
     if (allData.length === 0) {
+      // 캐시도 없고 시트도 못 가져오면 샘플로
       allData = getSampleData(currentTeam.sheetName);
-      if (err.message === 'NO_URL') setSyncStatus('offline');
+      showToast('⚠ 시트 연결 실패 — 샘플 데이터 표시');
+    } else {
+      showToast('⚠ 시트 연결 실패 — 캐시 데이터 사용');
     }
   } finally {
     showLoading(false);
@@ -516,66 +617,39 @@ async function loadData(showSpinner = false) {
   }
 }
 
-// 30초마다 자동 새로고침
-setInterval(() => { if (currentTeam && API_URL) loadData(false); }, 30000);
+// 5분마다 자동 새로고침 (시트 → 캐시)
+setInterval(() => { if (currentTeam) loadData(false); }, 5 * 60 * 1000);
 
 // ══════════════════════════════════════════
-//  완료 처리 → Apps Script POST
+//  완료 처리 — ★ 로컬 저장만 (시트 쓰기 X)
 // ══════════════════════════════════════════
-async function toggleComplete(id, rowNum, btn) {
-  const card = document.getElementById('card_' + id);
+function toggleComplete(id, rowNum) {
   const wasCompleted = !!completedMap[id];
   const now = new Date();
   const timeStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
 
-  // UI 즉시 업데이트 (낙관적 업데이트)
   if (wasCompleted) {
     delete completedMap[id];
+    showToast('↩ 완료 취소');
   } else {
-    completedMap[id] = { time: timeStr };
+    completedMap[id] = { time: timeStr, completedAt: now.toISOString() };
+    const rowData = allData.find(d => d._id === id);
+    if (rowData) {
+      recordDelivery(rowData, currentTeam.teamName, now);
+    }
+    showToast('✓ 완료 처리 (앱 저장)');
   }
   saveCompleted();
-  renderList(); // 즉시 반영
-
-  // 서버 동기화 (백그라운드)
-  if (API_URL) {
-    try {
-      card && card.classList.add('syncing-card');
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sheet: currentTeam.sheetName,
-          row: rowNum,
-          completed: !wasCompleted,
-          completedTime: !wasCompleted ? timeStr : '',
-        }),
-      });
-      const json = await res.json();
-      if (json.ok) {
-        showToast(!wasCompleted ? '✓ 완료 처리 — 시트에 반영됨' : '↩ 완료 취소 — 시트에 반영됨');
-      } else {
-        throw new Error(json.error);
-      }
-    } catch (err) {
-      showToast('⚠ 시트 반영 실패 (로컬 저장됨)');
-    } finally {
-      const c2 = document.getElementById('card_' + id);
-      c2 && c2.classList.remove('syncing-card');
-    }
-  } else {
-    showToast(!wasCompleted ? '✓ 완료 처리 (로컬 저장)' : '↩ 완료 취소');
-  }
+  renderList();
 }
 
 function saveCompleted() {
   if (!currentTeam) return;
-  localStorage.setItem('completed_v2_' + currentTeam.sheetName, JSON.stringify(completedMap));
+  localStorage.setItem(LS.completed(currentTeam.sheetName), JSON.stringify(completedMap));
 }
 
 // ══════════════════════════════════════════
-//  날짜 탭
+//  날짜/필터/렌더
 // ══════════════════════════════════════════
 function buildDateTabs() {
   const today = new Date();
@@ -590,24 +664,21 @@ function buildDateTabs() {
     if (d) daySet.add(d);
   });
 
-  // 전체 탭
   const allTab = document.createElement('div');
   allTab.className = 'date-tab' + (!currentDay ? ' active' : '');
   allTab.textContent = '전체';
   allTab.onclick = () => { currentDay = null; setActiveTab(allTab); renderList(); };
   container.appendChild(allTab);
 
-  // 요일 탭 (순서대로)
   dayOrder.filter(d => daySet.has(d)).forEach(d => {
     const tab = document.createElement('div');
     const isToday = d === todayKo;
     tab.className = 'date-tab' + (currentDay === d ? ' active' : '');
-    tab.innerHTML = isToday ? `오늘(${d})` : `${d}요일`;
+    tab.textContent = isToday ? `오늘(${d})` : `${d}요일`;
     tab.onclick = () => { currentDay = d; setActiveTab(tab); renderList(); };
     container.appendChild(tab);
   });
 
-  // 기본: 오늘 요일 (있으면)
   if (currentDay === null && daySet.has(todayKo)) {
     currentDay = todayKo;
     container.querySelectorAll('.date-tab').forEach(t => {
@@ -621,9 +692,6 @@ function setActiveTab(tab) {
   tab.classList.add('active');
 }
 
-// ══════════════════════════════════════════
-//  필터 & 렌더
-// ══════════════════════════════════════════
 function setFilter(chip, filter) {
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
   chip.classList.add('active');
@@ -633,18 +701,13 @@ function setFilter(chip, filter) {
 
 function renderList() {
   let data = [...allData];
-
-  if (currentDay) {
-    data = data.filter(r => (r['배송(요일)'] || r['자동요일'] || '').trim() === currentDay);
-  }
-
+  if (currentDay) data = data.filter(r => (r['배송(요일)'] || r['자동요일'] || '').trim() === currentDay);
   if (currentFilter === 'pending') data = data.filter(r => !completedMap[r._id]);
   if (currentFilter === 'done')    data = data.filter(r =>  completedMap[r._id]);
   if (currentFilter === 'direct')  data = data.filter(r => (r['출고방법']||'').includes('직배'));
   if (currentFilter === 'bus')     data = data.filter(r => (r['출고방법']||'').includes('버스'));
   if (currentFilter === 'cargo')   data = data.filter(r => (r['출고방법']||'').includes('화물'));
 
-  // 통계
   const dayData = allData.filter(r => !currentDay || (r['배송(요일)'] || r['자동요일'] || '').trim() === currentDay);
   const total = dayData.length;
   const done = dayData.filter(r => completedMap[r._id]).length;
@@ -665,7 +728,6 @@ function renderList() {
     return;
   }
 
-  // 미완료 → 완료 순
   data.sort((a, b) => (completedMap[a._id] ? 1 : 0) - (completedMap[b._id] ? 1 : 0));
 
   let shownDivider = false;
@@ -702,15 +764,14 @@ function buildCard(row, isCompleted) {
   const card = document.createElement('div');
   card.className = 'delivery-card' + (isCompleted ? ' completed' : '');
   card.id = 'card_' + row._id;
-
   card.innerHTML = `
     <div class="card-top">
       <span class="method-badge ${methodClass}">${method || '직배'}</span>
       <div class="card-main">
-        <div class="card-company">${company}</div>
+        <div class="card-company">${escapeHtml(company)}</div>
         <div class="card-region">
-          <span class="region-dot"></span>${region}
-          ${date ? `<span class="date-badge">${date}</span>` : ''}
+          <span class="region-dot"></span>${escapeHtml(region)}
+          ${date ? `<span class="date-badge">${escapeHtml(date)}</span>` : ''}
         </div>
       </div>
     </div>
@@ -718,8 +779,8 @@ function buildCard(row, isCompleted) {
       <div class="item-row">
         <div class="item-icon">📋</div>
         <div class="item-info">
-          <div class="item-name">${item || '품목 정보 없음'}</div>
-          ${qty ? `<div class="item-qty">수량: ${qty}</div>` : ''}
+          <div class="item-name">${escapeHtml(item) || '품목 정보 없음'}</div>
+          ${qty ? `<div class="item-qty">수량: ${escapeHtml(qty)}</div>` : ''}
         </div>
       </div>
     </div>
@@ -729,7 +790,7 @@ function buildCard(row, isCompleted) {
         ${timeInfo}
       </div>
       <button class="complete-btn ${isCompleted ? 'done' : 'pending'}"
-        onclick="toggleComplete('${row._id}', ${rowNum}, this)">
+        onclick="toggleComplete('${row._id}', ${rowNum})">
         <div class="check-icon">${isCompleted ? '✓' : ''}</div>
         ${isCompleted ? '완료됨' : '완료 처리'}
       </button>
@@ -738,31 +799,31 @@ function buildCard(row, isCompleted) {
   return card;
 }
 
-// ══════════════════════════════════════════
-//  동기화 상태 표시
-// ══════════════════════════════════════════
 function setSyncStatus(status) {
   const dot = document.getElementById('sync-dot');
   const label = document.getElementById('sync-label');
+  if (!dot || !label) return;
   dot.className = 'sync-dot ' + status;
-  label.textContent = { syncing: '동기화 중', online: '실시간 연결', offline: '오프라인' }[status] || '';
+  label.textContent = { syncing: '동기화 중', online: '시트 연결', offline: '오프라인' }[status] || '';
 }
 
-// ══════════════════════════════════════════
-//  샘플 데이터 (API 연결 전 미리보기용)
-// ══════════════════════════════════════════
 function getSampleData(sheet) {
   const base = [
     { 날짜:'04/02', 지역:'광주', 업체명:'두리공사', 품목:'간판 300*80', 수량:'1', 출고방법:'직배', 완료:'', '배송(요일)':'화', 자동요일:'화' },
-    { 날짜:'04/01', 지역:'광주', 업체명:'선진광고', 품목:'후렉스 700*125 채널 명품축산물', 수량:'2', 출고방법:'직배', 완료:'', '배송(요일)':'수', 자동요일:'수' },
+    { 날짜:'04/01', 지역:'광주', 업체명:'선진광고', 품목:'후렉스 700*125', 수량:'2', 출고방법:'직배', 완료:'', '배송(요일)':'수', 자동요일:'수' },
     { 날짜:'03/31', 지역:'광주', 업체명:'유진', 품목:'클리어필름', 수량:'3', 출고방법:'직배', 완료:'', '배송(요일)':'화', 자동요일:'화' },
-    { 날짜:'04/02', 지역:'광양', 업체명:'매화', 품목:'기성태극기 시기', 수량:'5', 출고방법:'직배', 완료:'', '배송(요일)':'목', 자동요일:'목' },
+    { 날짜:'04/02', 지역:'광양', 업체명:'매화', 품목:'기성태극기', 수량:'5', 출고방법:'직배', 완료:'', '배송(요일)':'목', 자동요일:'목' },
     { 날짜:'04/01', 지역:'강진', 업체명:'한솔', 품목:'직사각 현판 400*130', 수량:'1', 출고방법:'버스', 완료:'', '배송(요일)':'수', 자동요일:'수' },
   ];
   return base.map((d, i) => ({ ...d, _row: i + 2, _id: sheet + '_' + (i + 2) }));
 }
 
-// ── 유틸 ──
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
 function showLoading(v) { document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -773,6 +834,310 @@ function showToast(msg) {
 }
 
 window.addEventListener('load', () => showLoading(false));
+
+// ══════════════════════════════════════════
+//  통계 — 모두 앱 자체 저장 (localStorage)
+// ══════════════════════════════════════════
+
+// 거래 집계 저장: { '업체명': { count, region, team, lastDate } }
+function getStatsStore() {
+  try { return JSON.parse(localStorage.getItem(LS.stats) || '{}'); }
+  catch(e) { return {}; }
+}
+function saveStatsStore(store) { localStorage.setItem(LS.stats, JSON.stringify(store)); }
+
+// 거래 내역 저장 (시계열): [{ company, region, team, item, qty, method, completedAt, date }]
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(LS.history) || '[]'); }
+  catch(e) { return []; }
+}
+function saveHistory(arr) {
+  // 최근 1000건까지만 유지
+  if (arr.length > 1000) arr = arr.slice(-1000);
+  localStorage.setItem(LS.history, JSON.stringify(arr));
+}
+
+// 완료 처리 시 호출
+function recordDelivery(rowData, teamName, now) {
+  const company = (rowData['업체명'] || '').trim();
+  const region = (rowData['지역'] || '').trim();
+  if (!company || company === '—') return;
+
+  // 1) 집계
+  const store = getStatsStore();
+  if (!store[company]) {
+    store[company] = { count: 0, region: '', team: '', lastDate: '' };
+  }
+  store[company].count++;
+  store[company].region = region || store[company].region;
+  store[company].team = teamName || store[company].team;
+  store[company].lastDate = now.toLocaleDateString('ko-KR');
+  saveStatsStore(store);
+
+  // 2) 시계열 기록
+  const history = getHistory();
+  history.push({
+    company,
+    region,
+    team: teamName || '',
+    item: rowData['품목'] || '',
+    qty: rowData['수량'] || '',
+    method: rowData['출고방법'] || '',
+    date: rowData['날짜'] || '',
+    day: (rowData['배송(요일)'] || rowData['자동요일'] || '').trim(),
+    completedAt: now.toISOString(),
+  });
+  saveHistory(history);
+}
+
+function showStats() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('stats-screen').style.display = 'block';
+  renderAllStats();
+}
+function hideStats() {
+  document.getElementById('stats-screen').style.display = 'none';
+  if (currentTeam) {
+    document.getElementById('app-screen').style.display = 'block';
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+}
+
+function resetStats() {
+  if (!confirm('모든 거래 기록을 초기화하시겠습니까?\n(집계 + 시계열 내역 모두 삭제)\n이 작업은 되돌릴 수 없습니다.')) return;
+  localStorage.removeItem(LS.stats);
+  localStorage.removeItem(LS.history);
+  renderAllStats();
+  showToast('거래 기록 초기화 완료');
+}
+
+function switchStatsTab(el, tab) {
+  currentStatsTab = tab;
+  document.querySelectorAll('.stats-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('stats-tab-company').style.display = tab === 'company' ? 'block' : 'none';
+  document.getElementById('stats-tab-region').style.display = tab === 'region' ? 'block' : 'none';
+  document.getElementById('stats-tab-period').style.display = tab === 'period' ? 'block' : 'none';
+  renderAllStats();
+}
+
+function setPeriod(el, period) {
+  currentPeriod = period;
+  document.querySelectorAll('.period-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderStatsPeriod();
+}
+
+function getFilteredHistoryByTeam() {
+  const teamSel = document.getElementById('stats-team-select').value;
+  const history = getHistory();
+  return teamSel ? history.filter(h => h.team === teamSel) : history;
+}
+
+function renderAllStats() {
+  renderStatsSummary();
+  if (currentStatsTab === 'company') renderStatsCompany();
+  if (currentStatsTab === 'region') renderStatsRegion();
+  if (currentStatsTab === 'period') renderStatsPeriod();
+}
+
+function renderStatsSummary() {
+  const teamSel = document.getElementById('stats-team-select').value;
+  const store = getStatsStore();
+  let entries = Object.entries(store).map(([name, v]) => ({ name, ...v }));
+  if (teamSel) entries = entries.filter(e => e.team === teamSel);
+
+  const total = entries.reduce((s, e) => s + e.count, 0);
+  const bizCount = entries.length;
+  const lowCount = entries.filter(e => e.count <= 3).length;
+
+  const summary = document.getElementById('stats-summary');
+  summary.innerHTML = `
+    <div class="stats-sum-card"><div class="stats-sum-num" style="color:var(--accent)">${total}</div><div class="stats-sum-label">총 완료건수</div></div>
+    <div class="stats-sum-card"><div class="stats-sum-num" style="color:var(--green)">${bizCount}</div><div class="stats-sum-label">거래 업체수</div></div>
+    <div class="stats-sum-card"><div class="stats-sum-num" style="color:#ef4444">${lowCount}</div><div class="stats-sum-label">부진 업체</div></div>
+  `;
+}
+
+// ── 업체별 ──
+function renderStatsCompany() {
+  const teamSel = document.getElementById('stats-team-select').value;
+  const sortOrder = document.getElementById('stats-sort').value;
+  const store = getStatsStore();
+
+  let entries = Object.entries(store).map(([name, v]) => ({ name, ...v }));
+  if (teamSel) entries = entries.filter(e => e.team === teamSel);
+  entries.sort((a, b) => sortOrder === 'asc' ? a.count - b.count : b.count - a.count);
+
+  const chart = document.getElementById('stats-chart');
+  if (entries.length === 0) {
+    chart.innerHTML = '<div style="text-align:center;color:var(--text2);padding:30px;font-size:13px;line-height:1.8;">아직 기록된 거래가 없습니다.<br><span style="font-size:12px;">배송 완료 처리를 하면 자동으로 거래량이 쌓입니다.</span></div>';
+    document.getElementById('stats-low-list').innerHTML = '';
+    return;
+  }
+
+  const maxCount = Math.max(...entries.map(e => e.count));
+  const COLORS = ['#4f8fff','#6b5fff','#22c55e','#f59e0b','#a855f7','#06b6d4','#f97316','#ec4899'];
+  chart.innerHTML = entries.map((e, i) => {
+    const pct = Math.round((e.count / maxCount) * 100);
+    const color = e.count <= 3 ? '#ef4444' : e.count <= 7 ? '#f59e0b' : COLORS[i % COLORS.length];
+    return `
+      <div class="stats-bar-item">
+        <div class="stats-bar-label" title="${escapeHtml(e.name)}">${escapeHtml(e.name)}</div>
+        <div class="stats-bar-track">
+          <div class="stats-bar-fill" style="width:${pct}%;background:${color};">
+            <span class="stats-bar-val">${e.count}건</span>
+          </div>
+        </div>
+        <div class="stats-bar-region">${escapeHtml(e.region || '')}</div>
+      </div>`;
+  }).join('');
+
+  const lowList = document.getElementById('stats-low-list');
+  const lowItems = entries.filter(e => e.count <= 3).sort((a,b) => a.count - b.count);
+  if (lowItems.length === 0) {
+    lowList.innerHTML = '<div style="font-size:13px;color:var(--text2);padding:8px 0;">부진 업체 없음 ✓</div>';
+  } else {
+    lowList.innerHTML = lowItems.map(e => `
+      <div class="low-item">
+        <div>
+          <div class="low-name">${escapeHtml(e.name)}</div>
+          <div class="low-info">${escapeHtml(e.region || '')} · ${escapeHtml(e.team || '')} · 최근: ${escapeHtml(e.lastDate || '-')}</div>
+        </div>
+        <div class="low-count">${e.count}건</div>
+      </div>`).join('');
+  }
+}
+
+// ── 지역별 ★ 신규 ──
+function renderStatsRegion() {
+  const teamSel = document.getElementById('stats-team-select').value;
+  const store = getStatsStore();
+  let entries = Object.entries(store).map(([name, v]) => ({ name, ...v }));
+  if (teamSel) entries = entries.filter(e => e.team === teamSel);
+
+  // 지역별 그룹핑
+  const regionMap = {};
+  entries.forEach(e => {
+    const region = (e.region || '미분류').trim() || '미분류';
+    if (!regionMap[region]) regionMap[region] = { count: 0, companies: [], team: e.team };
+    regionMap[region].count += e.count;
+    regionMap[region].companies.push({ name: e.name, count: e.count });
+  });
+
+  const list = document.getElementById('region-list');
+  const regions = Object.entries(regionMap).map(([name, v]) => ({ name, ...v }))
+    .sort((a, b) => b.count - a.count);
+
+  if (regions.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--text2);padding:30px;font-size:13px;">아직 기록된 거래가 없습니다.</div>';
+    return;
+  }
+
+  const totalAll = regions.reduce((s, r) => s + r.count, 0);
+  const maxCount = Math.max(...regions.map(r => r.count));
+  const COLORS = ['#4f8fff','#22c55e','#f59e0b','#6b5fff','#a855f7','#06b6d4','#f97316','#ec4899'];
+
+  list.innerHTML = regions.map((r, i) => {
+    const pct = Math.round((r.count / maxCount) * 100);
+    const sharePct = totalAll > 0 ? Math.round((r.count / totalAll) * 100) : 0;
+    const color = COLORS[i % COLORS.length];
+    const topCompanies = r.companies.sort((a,b) => b.count - a.count).slice(0, 8);
+    return `
+      <div class="region-card">
+        <div class="region-card-top">
+          <div class="region-name">📍 ${escapeHtml(r.name)}</div>
+          <div class="region-stats">
+            <strong>${r.count}건</strong> · 업체 ${r.companies.length}개 · 비중 ${sharePct}%
+          </div>
+        </div>
+        <div class="region-progress">
+          <div class="region-progress-fill" style="width:${pct}%;background:${color};"></div>
+        </div>
+        <div class="region-companies">
+          ${topCompanies.map(c => `<span>${escapeHtml(c.name)} ${c.count}</span>`).join('')}
+          ${r.companies.length > 8 ? `<span style="opacity:0.6;">외 ${r.companies.length - 8}개</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── 기간별 ──
+function getPeriodRange() {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (currentPeriod === 'all') return { from: null, to: null };
+  if (currentPeriod === 'thisMonth') {
+    return { from: new Date(now.getFullYear(), now.getMonth(), 1),
+             to: new Date(now.getFullYear(), now.getMonth() + 1, 1) };
+  }
+  if (currentPeriod === 'lastMonth') {
+    return { from: new Date(now.getFullYear(), now.getMonth() - 1, 1),
+             to: new Date(now.getFullYear(), now.getMonth(), 1) };
+  }
+  if (currentPeriod === 'last30') {
+    const f = new Date(today); f.setDate(f.getDate() - 30);
+    return { from: f, to: new Date(today.getTime() + 86400000) };
+  }
+  if (currentPeriod === 'last7') {
+    const f = new Date(today); f.setDate(f.getDate() - 7);
+    return { from: f, to: new Date(today.getTime() + 86400000) };
+  }
+  return { from: null, to: null };
+}
+
+function renderStatsPeriod() {
+  const { from, to } = getPeriodRange();
+  const teamSel = document.getElementById('stats-team-select').value;
+  let history = getHistory();
+  if (teamSel) history = history.filter(h => h.team === teamSel);
+  if (from) history = history.filter(h => {
+    const t = new Date(h.completedAt);
+    return t >= from && t < to;
+  });
+
+  // 요일별 분포
+  const dayCounts = { '월':0,'화':0,'수':0,'목':0,'금':0,'토':0,'일':0 };
+  history.forEach(h => {
+    const d = h.day || DAY_KO[new Date(h.completedAt).getDay()];
+    if (dayCounts[d] !== undefined) dayCounts[d]++;
+  });
+
+  const maxDay = Math.max(1, ...Object.values(dayCounts));
+  const dayChart = document.getElementById('period-day-chart');
+  dayChart.innerHTML = Object.entries(dayCounts).map(([d, c]) => {
+    const pct = Math.round((c / maxDay) * 100);
+    return `
+      <div class="day-bar">
+        <div class="day-bar-label">${d}요일</div>
+        <div class="day-bar-track"><div class="day-bar-fill" style="width:${pct}%;"></div></div>
+        <div class="day-bar-val">${c}건</div>
+      </div>`;
+  }).join('');
+
+  // 거래 내역 (최근 100건)
+  const recent = history.slice().reverse().slice(0, 100);
+  const histEl = document.getElementById('period-history');
+  if (recent.length === 0) {
+    histEl.innerHTML = '<div style="text-align:center;color:var(--text2);padding:20px;font-size:12px;">기간 내 거래 없음</div>';
+    return;
+  }
+  histEl.innerHTML = recent.map(h => {
+    const t = new Date(h.completedAt);
+    const ts = `${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface2);padding:8px 10px;border-radius:6px;font-size:12px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(h.company)}</div>
+          <div style="color:var(--text2);font-size:10px;margin-top:2px;">${escapeHtml(h.region || '-')} · ${escapeHtml(h.item || '-')}</div>
+        </div>
+        <div style="color:var(--text3);font-size:10px;font-family:'JetBrains Mono',monospace;">${ts}</div>
+      </div>`;
+  }).join('');
+}
 </script>
 </body>
 </html>
